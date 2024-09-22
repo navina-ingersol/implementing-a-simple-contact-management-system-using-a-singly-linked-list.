@@ -1,0 +1,180 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+typedef struct Node {
+char name[50];
+struct Node* next;
+} Node;
+Node* head = NULL;
+
+// Function to display the contact list
+void displayContacts() {
+Node* current = head;
+printf("Contact list: ");
+while (current != NULL) {
+printf("%s -> ", current->name);
+current = current->next;
+}
+printf("NULL\n");
+}
+// Function to create the contact list
+void createContactList(int count) {
+head = NULL;
+for (int i = 0; i < count; i++) {
+Node* newNode = (Node*)malloc(sizeof(Node));
+printf("Enter contact name %d: ", i + 1);
+fgets(newNode->name, sizeof(newNode->name), stdin);
+newNode->name[strcspn(newNode->name, "\n")] = 0; // Remove newline
+newNode->next = head;
+head = newNode;
+}
+displayContacts();
+}
+// Function to insert a new contact
+void insertContact(char* name, int position) {
+Node* newNode = (Node*)malloc(sizeof(Node));
+strcpy(newNode->name, name);
+newNode->next = NULL;
+if (position == 0) {
+newNode->next = head;
+head = newNode;
+} else {
+Node* current = head;
+for (int i = 0; i < position - 1 && current != NULL; i++) {
+current = current->next;
+}
+if (current != NULL) {
+newNode->next = current->next;
+current->next = newNode;
+} else {
+
+printf("Invalid position.\n");
+free(newNode);
+}
+}
+displayContacts();
+}
+// Function to delete a contact
+void deleteContact(char option) {
+if (option == 'n') {
+char name[50];
+printf("Enter the contact's name to delete: ");
+fgets(name, sizeof(name), stdin);
+name[strcspn(name, "\n")] = 0; // Remove newline
+Node *current = head, *prev = NULL;
+while (current != NULL && strcmp(current->name, name) != 0) {
+prev = current;
+current = current->next;
+}
+if (current != NULL) {
+if (prev == NULL) {
+head = current->next; // Deleting head
+} else {
+prev->next = current->next; // Bypass the deleted node
+}
+free(current);
+} else {
+printf("Contact not found.\n");
+}
+} else if (option == 'p') {
+int position;
+printf("Enter the position (0-based index) to delete: ");
+scanf("%d", &position);
+getchar(); // Consume newline
+Node *current = head, *prev = NULL;
+for (int i = 0; i < position && current != NULL; i++) {
+prev = current;
+current = current->next;
+}
+if (current != NULL) {
+if (prev == NULL) {
+head = current->next; // Deleting head
+
+} else {
+prev->next = current->next; // Bypass the deleted node
+}
+free(current);
+} else {
+printf("Invalid position.\n");
+}
+} else {
+printf("Invalid option.\n");
+}
+displayContacts();
+}
+// Function to search for a contact
+void searchContact(char* name) {
+Node* current = head;
+int position = 0;
+while (current != NULL) {
+if (strcmp(current->name, name) == 0) {
+printf("%s found at position %d\n", name, position);
+return;
+}
+current = current->next;
+position++;
+}
+printf("Contact not found.\n");
+}
+int main() {
+int choice;
+while (1) {
+printf("1. Create the list of contacts\n");
+printf("2. Insert a new contact\n");
+printf("3. Delete a contact\n");
+printf("4. Display contact list\n");
+printf("5. Search for a contact\n");
+printf("6. Exit\n");
+printf("Enter your choice: ");
+scanf("%d", &choice);
+getchar(); // Consume newline
+switch (choice) {
+case 1: {
+
+int count;
+printf("Enter the number of contacts: ");
+scanf("%d", &count);
+getchar(); // Consume newline
+createContactList(count);
+break;
+}
+case 2: {
+char name[50];
+int position;
+printf("Enter the contact's name to insert: ");
+fgets(name, sizeof(name), stdin);
+name[strcspn(name, "\n")] = 0; // Remove newline
+printf("Enter the position (0-based index) to insert the contact: ");
+scanf("%d", &position);
+getchar(); // Consume newline
+insertContact(name, position);
+break;
+}
+case 3: {
+char option;
+printf("Delete by name or position? (n/p): ");
+scanf(" %c", &option);
+getchar(); // Consume newline
+deleteContact(option);
+break;
+}
+case 4:
+displayContacts();
+break;
+case 5: {
+char name[50];
+printf("Enter the contact's name to search: ");
+fgets(name, sizeof(name), stdin);
+name[strcspn(name, "\n")] = 0; // Remove newline
+searchContact(name);
+break;
+}
+case 6:
+printf("Exiting the program...\n");
+return 0;
+default:
+printf("Invalid choice. Please try again.\n");
+}
+
+}
+}
